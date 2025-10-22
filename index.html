@@ -276,7 +276,6 @@
         // Calculator state
         let currentExpression = '';
         let currentResult = '0';
-        let lastOperator = '';
         let shouldResetDisplay = false;
         let isDarkMode = true;
         
@@ -311,38 +310,41 @@
         // Handle number input
         function inputNumber(number) {
             if (shouldResetDisplay) {
-                currentExpression = '';
+                // Instead of resetting the expression, we just reset the display flag
                 shouldResetDisplay = false;
             }
             
-            // Prevent multiple decimal points
-            if (number === '.' && currentExpression.includes('.')) {
+            // Prevent multiple decimal points in the current number
+            if (number === '.' && currentExpression.includes('.') && !currentExpression.includes(' ')) {
                 return;
             }
             
-            // Prevent leading zeros
-            if (number === '0' && currentExpression === '0') {
-                return;
-            }
-            
-            // Replace initial zero
-            if (currentExpression === '0' && number !== '.') {
-                currentExpression = number;
+            // If we're starting a new number after an operator, we need to handle it differently
+            const lastChar = currentExpression.slice(-1);
+            if (['+', '-', '×', '÷'].includes(lastChar)) {
+                // We're starting a new number after an operator
+                currentExpression += ` ${number}`;
             } else {
+                // We're continuing the current number
                 currentExpression += number;
             }
         }
         
         // Handle operator input
         function inputOperator(operator) {
-            if (currentExpression === '' && currentResult !== '0') {
+            if (currentExpression === '') {
+                // If there's no expression yet, use the current result
                 currentExpression = currentResult;
             }
             
-            if (currentExpression !== '') {
-                currentExpression += ` ${operator} `;
-                shouldResetDisplay = true;
+            // Remove any trailing operator if present
+            const lastChar = currentExpression.trim().slice(-1);
+            if (['+', '-', '×', '÷'].includes(lastChar)) {
+                currentExpression = currentExpression.slice(0, -1).trim();
             }
+            
+            currentExpression += ` ${operator}`;
+            shouldResetDisplay = false;
         }
         
         // Handle actions (clear, delete, calculate)
@@ -351,6 +353,7 @@
                 case 'clear':
                     currentExpression = '';
                     currentResult = '0';
+                    shouldResetDisplay = false;
                     break;
                 case 'delete':
                     if (currentExpression.endsWith(' ')) {
@@ -391,7 +394,7 @@
                 currentResult = formatResult(result);
                 displayResult.classList.add('result-pop');
                 
-                // Reset for next input
+                // Set the flag to reset display for next input
                 shouldResetDisplay = true;
             } catch (error) {
                 currentResult = 'Error';
