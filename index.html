@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glassmorphism Calculator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
             --primary-color: #6c63ff;
@@ -17,13 +18,31 @@
             --operator-color: #ff9a3c;
             --equals-color: #4cd964;
             --clear-color: #ff3b30;
+            --display-bg: rgba(0, 0, 0, 0.2);
+            --glass-blur: blur(20px);
+        }
+
+        .light-mode {
+            --primary-color: #6c63ff;
+            --secondary-color: #4a44c9;
+            --background-color: rgba(255, 255, 255, 0.8);
+            --text-color: #333;
+            --button-bg: rgba(255, 255, 255, 0.6);
+            --button-hover: rgba(255, 255, 255, 0.8);
+            --button-active: rgba(255, 255, 255, 1);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --operator-color: #ff7b00;
+            --equals-color: #2ecc71;
+            --clear-color: #e74c3c;
+            --display-bg: rgba(0, 0, 0, 0.05);
+            --glass-blur: blur(15px);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
@@ -34,18 +53,26 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             transition: background 0.5s ease;
+            overflow: hidden;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         }
 
         .calculator {
             width: 100%;
             max-width: 360px;
             background: var(--background-color);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 24px;
             padding: 25px;
-            box-shadow: 0 10px 30px var(--shadow-color);
+            box-shadow: 0 15px 35px var(--shadow-color);
             border: 1px solid rgba(255, 255, 255, 0.2);
             animation: float-in 0.6s ease-out;
+            position: relative;
+            z-index: 10;
         }
 
         @keyframes float-in {
@@ -59,25 +86,38 @@
             }
         }
 
+        .calculator-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
         .display {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
+            background: var(--display-bg);
+            border-radius: 18px;
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-align: right;
-            min-height: 100px;
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
             transition: all 0.3s ease;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .expression {
             font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(var(--text-color), 0.7);
             min-height: 24px;
             word-break: break-all;
+            transition: all 0.3s ease;
         }
 
         .result {
@@ -85,6 +125,7 @@
             font-weight: 600;
             color: var(--text-color);
             transition: all 0.3s ease;
+            line-height: 1.2;
         }
 
         .buttons-grid {
@@ -97,16 +138,19 @@
             border: none;
             outline: none;
             height: 70px;
-            border-radius: 15px;
+            border-radius: 18px;
             font-size: 1.3rem;
             font-weight: 500;
             background: var(--button-bg);
             color: var(--text-color);
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         button::after {
@@ -119,12 +163,13 @@
             background: rgba(255, 255, 255, 0.1);
             opacity: 0;
             transition: opacity 0.2s;
+            border-radius: 18px;
         }
 
         button:hover {
             background: var(--button-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
         }
 
         button:hover::after {
@@ -134,7 +179,7 @@
         button:active {
             background: var(--button-active);
             transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .operator {
@@ -174,6 +219,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 1.2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .theme-btn:hover {
@@ -213,6 +259,147 @@
             }
         }
 
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Floating background elements */
+        .floating-bg {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(76, 217, 100, 0.2));
+            filter: blur(40px);
+            animation: float 15s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        .floating-bg:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-bg:nth-child(2) {
+            bottom: 10%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .floating-bg:nth-child(3) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(20px, -20px) scale(1.1);
+            }
+            50% {
+                transform: translate(-15px, 15px) scale(0.9);
+            }
+            75% {
+                transform: translate(-20px, -15px) scale(1.05);
+            }
+        }
+
+        /* Button entrance animation */
+        .buttons-grid button {
+            opacity: 0;
+            animation: button-enter 0.5s ease forwards;
+        }
+
+        .buttons-grid button:nth-child(1) { animation-delay: 0.1s; }
+        .buttons-grid button:nth-child(2) { animation-delay: 0.15s; }
+        .buttons-grid button:nth-child(3) { animation-delay: 0.2s; }
+        .buttons-grid button:nth-child(4) { animation-delay: 0.25s; }
+        .buttons-grid button:nth-child(5) { animation-delay: 0.3s; }
+        .buttons-grid button:nth-child(6) { animation-delay: 0.35s; }
+        .buttons-grid button:nth-child(7) { animation-delay: 0.4s; }
+        .buttons-grid button:nth-child(8) { animation-delay: 0.45s; }
+        .buttons-grid button:nth-child(9) { animation-delay: 0.5s; }
+        .buttons-grid button:nth-child(10) { animation-delay: 0.55s; }
+        .buttons-grid button:nth-child(11) { animation-delay: 0.6s; }
+        .buttons-grid button:nth-child(12) { animation-delay: 0.65s; }
+        .buttons-grid button:nth-child(13) { animation-delay: 0.7s; }
+        .buttons-grid button:nth-child(14) { animation-delay: 0.75s; }
+        .buttons-grid button:nth-child(15) { animation-delay: 0.8s; }
+        .buttons-grid button:nth-child(16) { animation-delay: 0.85s; }
+        .buttons-grid button:nth-child(17) { animation-delay: 0.9s; }
+        .buttons-grid button:nth-child(18) { animation-delay: 0.95s; }
+        .buttons-grid button:nth-child(19) { animation-delay: 1s; }
+
+        @keyframes button-enter {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Welcome animation */
+        .welcome-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 24px;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            animation: welcome-fade 2.5s ease;
+        }
+
+        @keyframes welcome-fade {
+            0% {
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .welcome-text {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 500;
+            text-align: center;
+            padding: 20px;
+        }
+
         /* Responsive design */
         @media (max-width: 480px) {
             .calculator {
@@ -228,38 +415,66 @@
             .result {
                 font-size: 2rem;
             }
+            
+            .calculator-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .calculator {
+                padding: 15px;
+            }
+            
+            button {
+                height: 55px;
+                font-size: 1rem;
+            }
+            
+            .buttons-grid {
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="floating-bg"></div>
+    <div class="floating-bg"></div>
+    <div class="floating-bg"></div>
+    
     <div class="calculator">
+        <div class="welcome-message">
+            <div class="welcome-text">Ready to calculate?</div>
+        </div>
+        
+        <div class="calculator-title">Glass Calculator</div>
         <div class="display">
             <div class="expression"></div>
             <div class="result">0</div>
         </div>
         <div class="buttons-grid">
-            <button class="clear" data-action="clear">C</button>
-            <button class="delete" data-action="delete">⌫</button>
-            <button class="operator" data-operator="÷">÷</button>
-            <button class="operator" data-operator="×">×</button>
+            <button class="clear" data-action="clear" title="Clear">C</button>
+            <button class="delete" data-action="delete" title="Delete">⌫</button>
+            <button class="operator" data-operator="÷" title="Divide">÷</button>
+            <button class="operator" data-operator="×" title="Multiply">×</button>
             
-            <button data-number="7">7</button>
-            <button data-number="8">8</button>
-            <button data-number="9">9</button>
-            <button class="operator" data-operator="-">-</button>
+            <button data-number="7" title="7">7</button>
+            <button data-number="8" title="8">8</button>
+            <button data-number="9" title="9">9</button>
+            <button class="operator" data-operator="-" title="Subtract">-</button>
             
-            <button data-number="4">4</button>
-            <button data-number="5">5</button>
-            <button data-number="6">6</button>
-            <button class="operator" data-operator="+">+</button>
+            <button data-number="4" title="4">4</button>
+            <button data-number="5" title="5">5</button>
+            <button data-number="6" title="6">6</button>
+            <button class="operator" data-operator="+" title="Add">+</button>
             
-            <button data-number="1">1</button>
-            <button data-number="2">2</button>
-            <button data-number="3">3</button>
-            <button class="equals" data-action="calculate">=</button>
+            <button data-number="1" title="1">1</button>
+            <button data-number="2" title="2">2</button>
+            <button data-number="3" title="3">3</button>
+            <button class="equals" data-action="calculate" title="Calculate">=</button>
             
-            <button data-number="0" class="span-two">0</button>
-            <button data-number=".">.</button>
+            <button data-number="0" class="span-two" title="0">0</button>
+            <button data-number="." title="Decimal Point">.</button>
         </div>
         <div class="theme-toggle">
             <div class="theme-btn" title="Toggle theme">🌙</div>
@@ -272,6 +487,7 @@
         const displayResult = document.querySelector('.result');
         const buttons = document.querySelectorAll('button');
         const themeBtn = document.querySelector('.theme-btn');
+        const body = document.querySelector('body');
         
         // Calculator state
         let currentExpression = '';
@@ -285,7 +501,10 @@
             
             // Add event listeners to buttons
             buttons.forEach(button => {
-                button.addEventListener('click', () => {
+                button.addEventListener('click', (e) => {
+                    // Create ripple effect
+                    createRipple(e);
+                    
                     const { number, operator, action } = button.dataset;
                     
                     if (number !== undefined) {
@@ -305,6 +524,26 @@
             
             // Add theme toggle
             themeBtn.addEventListener('click', toggleTheme);
+        }
+        
+        // Create ripple effect on button click
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+            circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+            circle.classList.add('ripple');
+            
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) {
+                ripple.remove();
+            }
+            
+            button.appendChild(circle);
         }
         
         // Handle number input
@@ -396,6 +635,9 @@
                 
                 // Set the flag to reset display for next input
                 shouldResetDisplay = true;
+                
+                // Save calculation to history
+                saveToHistory(currentExpression, currentResult);
             } catch (error) {
                 currentResult = 'Error';
                 displayResult.classList.add('error');
@@ -506,33 +748,32 @@
             isDarkMode = !isDarkMode;
             
             if (isDarkMode) {
-                // Dark mode
-                document.documentElement.style.setProperty('--primary-color', '#6c63ff');
-                document.documentElement.style.setProperty('--secondary-color', '#4a44c9');
-                document.documentElement.style.setProperty('--background-color', 'rgba(255, 255, 255, 0.1)');
-                document.documentElement.style.setProperty('--text-color', '#fff');
-                document.documentElement.style.setProperty('--button-bg', 'rgba(255, 255, 255, 0.2)');
-                document.documentElement.style.setProperty('--button-hover', 'rgba(255, 255, 255, 0.3)');
-                document.documentElement.style.setProperty('--button-active', 'rgba(255, 255, 255, 0.4)');
-                document.documentElement.style.setProperty('--shadow-color', 'rgba(0, 0, 0, 0.1)');
+                body.classList.remove('light-mode');
                 themeBtn.textContent = '🌙';
-                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
             } else {
-                // Light mode
-                document.documentElement.style.setProperty('--primary-color', '#6c63ff');
-                document.documentElement.style.setProperty('--secondary-color', '#4a44c9');
-                document.documentElement.style.setProperty('--background-color', 'rgba(255, 255, 255, 0.8)');
-                document.documentElement.style.setProperty('--text-color', '#333');
-                document.documentElement.style.setProperty('--button-bg', 'rgba(255, 255, 255, 0.6)');
-                document.documentElement.style.setProperty('--button-hover', 'rgba(255, 255, 255, 0.8)');
-                document.documentElement.style.setProperty('--button-active', 'rgba(255, 255, 255, 1)');
-                document.documentElement.style.setProperty('--shadow-color', 'rgba(0, 0, 0, 0.1)');
+                body.classList.add('light-mode');
                 themeBtn.textContent = '☀️';
-                document.body.style.background = 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)';
             }
             
             // Save theme preference to localStorage
             localStorage.setItem('calculatorTheme', isDarkMode ? 'dark' : 'light');
+        }
+        
+        // Save calculation to localStorage
+        function saveToHistory(expression, result) {
+            const history = JSON.parse(localStorage.getItem('calculatorHistory') || '[]');
+            history.unshift({
+                expression,
+                result,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Keep only the last 10 calculations
+            if (history.length > 10) {
+                history.pop();
+            }
+            
+            localStorage.setItem('calculatorHistory', JSON.stringify(history));
         }
         
         // Load saved theme preference
