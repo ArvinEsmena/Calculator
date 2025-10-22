@@ -20,6 +20,7 @@
             --clear-color: #ff3b30;
             --display-bg: rgba(0, 0, 0, 0.2);
             --glass-blur: blur(20px);
+            --background-image: url('img/dark.png');
         }
 
         .light-mode {
@@ -36,6 +37,7 @@
             --clear-color: #e74c3c;
             --display-bg: rgba(0, 0, 0, 0.05);
             --glass-blur: blur(15px);
+            --background-image: url('img/light.png');
         }
 
         * {
@@ -50,14 +52,11 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--background-image) no-repeat center center fixed;
+            background-size: cover;
             padding: 20px;
             transition: background 0.5s ease;
             overflow: hidden;
-        }
-
-        body.light-mode {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         }
 
         .calculator {
@@ -276,52 +275,6 @@
             }
         }
 
-        /* Floating background elements */
-        .floating-bg {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(76, 217, 100, 0.2));
-            filter: blur(40px);
-            animation: float 15s infinite ease-in-out;
-            z-index: 1;
-        }
-
-        .floating-bg:nth-child(1) {
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .floating-bg:nth-child(2) {
-            bottom: 10%;
-            right: 10%;
-            animation-delay: -5s;
-        }
-
-        .floating-bg:nth-child(3) {
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translate(0, 0) scale(1);
-            }
-            25% {
-                transform: translate(20px, -20px) scale(1.1);
-            }
-            50% {
-                transform: translate(-15px, 15px) scale(0.9);
-            }
-            75% {
-                transform: translate(-20px, -15px) scale(1.05);
-            }
-        }
-
         /* Button entrance animation */
         .buttons-grid button {
             opacity: 0;
@@ -438,10 +391,6 @@
     </style>
 </head>
 <body>
-    <div class="floating-bg"></div>
-    <div class="floating-bg"></div>
-    <div class="floating-bg"></div>
-    
     <div class="calculator">
         <div class="welcome-message">
             <div class="welcome-text">Ready to calculate?</div>
